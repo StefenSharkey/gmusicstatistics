@@ -10,7 +10,7 @@ gmusicstatistics compiles against the following:
 
 * [Python 2.7.11](https://www.python.org/)
 * [gmusicapi](https://github.com/simon-weber/gmusicapi)
-* [PyQt4](https://wiki.python.org/moin/PyQt4)
+* [PyQt4](https://www.riverbankcomputing.com/software/pyqt/download)
 
 Status and Updates
 ------------------

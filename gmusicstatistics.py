@@ -275,13 +275,12 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
 
         return new_data
 
-    @staticmethod
-    def add_total_plays(songs):
+    def add_total_plays(self, songs):
         # Creates a JSON database of the current song.
         song = json.loads(songs, encoding='utf8')
 
         # Multiplies play count by the duration in milliseconds.
-        return song['playCount'] * int(song['durationMillis'])
+        return song['playCount'] * self.millis_to_seconds(long(song['durationMillis']))
 
     def add_all_plays(self, song):
         # Creates a JSON database of the current song.

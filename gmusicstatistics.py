@@ -248,7 +248,7 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         self.scroll_table.setHorizontalHeaderLabels(data.keys())
 
         # for index, time in enumerate(data['Total Time']):
-        #     data['Total Time'][index] = self.millis_to_seconds(long(time), truncate=True)
+        #     data['Total Time'][index] = self.millis_to_seconds(int(time), truncate=True)
 
         for x, key in enumerate(data.keys()):
             if debug:
@@ -280,7 +280,7 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         song = json.loads(songs, encoding='utf8')
 
         # Multiplies play count by the duration in milliseconds.
-        return song['playCount'] * self.millis_to_seconds(long(song['durationMillis']))
+        return song['playCount'] * self.millis_to_seconds(int(song['durationMillis']))
 
     def add_all_plays(self, song):
         # Creates a JSON database of the current song.
@@ -322,19 +322,19 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         # Writes the total time played.
         if not len(genre_total_time) == len(genre_total_plays):
             genre_total_time.append(0)
-        genre_total_time[index_genre] += long(song['playCount']) * self.millis_to_seconds(long(song['durationMillis']))
+        genre_total_time[index_genre] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
 
         if not len(artist_total_time) == len(artist_total_plays):
             artist_total_time.append(0)
-        artist_total_time[index_artist] += long(song['playCount']) * self.millis_to_seconds(long(song['durationMillis']))
+        artist_total_time[index_artist] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
 
         if not len(album_total_time) == len(album_total_plays):
             album_total_time.append(0)
-        album_total_time[index_album] += long(song['playCount']) * self.millis_to_seconds(long(song['durationMillis']))
+        album_total_time[index_album] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
 
         if not len(song_total_time) == len(song_total_plays):
             song_total_time.append(0)
-        song_total_time[index_song] += long(song['playCount']) * self.millis_to_seconds(long(song['durationMillis']))
+        song_total_time[index_song] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
 
         # Artist for album view.
         if not len(album_artist) == len(album_total_time):
@@ -381,7 +381,7 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
     @staticmethod
     def millis_to_seconds(millis, truncate=False):
         seconds = millis / 1000
-        return int(seconds) if truncate else seconds
+        return seconds if truncate else seconds
 
     @staticmethod
     def str_to_json(string, single_to_double=False):

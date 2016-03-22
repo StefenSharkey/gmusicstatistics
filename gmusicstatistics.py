@@ -544,7 +544,7 @@ class LoginWindow(QtGui.QDialog):
 
     def button_clicked(self):
         if self.sender() == self.button_okay:
-            if not api.login(unicode(self.username_text.text()), unicode(self.password_text.text()),
+            if not api.login(str(self.username_text.text()), str(self.password_text.text()),
                              Mobileclient.FROM_MAC_ADDRESS):
                 self.error_message.setText('Username and/or password incorrect.')
             else:

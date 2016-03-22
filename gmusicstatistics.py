@@ -35,6 +35,9 @@ debug = False
 
 create_file = False
 
+gmusicstatistics_version = "0.1"
+gmusicstatistics_build_date = "March 22, 2016"
+
 api = Mobileclient()
 
 genre_plays = OrderedDict([('Genre', []), ('Total Plays', []), ('Total Time', [])])
@@ -133,11 +136,13 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         menu_play_types = QtGui.QMenu()
         play_types_group = QtGui.QActionGroup(self)
 
+        # File menu
         action_quit = QtGui.QAction('&Exit', self,
                                     shortcut='Ctrl+W',
                                     statusTip='Exit application',
                                     triggered=self.close)
 
+        # View menu
         action_play_types = QtGui.QAction('&Play Types', self)
         action_play_types.setMenu(menu_play_types)
 
@@ -177,9 +182,10 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         QtCore.QObject.connect(action_play_types_songs, QtCore.SIGNAL('triggered()'),
                                lambda: self.fill_table(song_plays))
 
-        # action_about = QtGui.QAction('&About', self,
-        #                        statusTip="Show the application's About box",
-        #                        triggered=self.about)
+        # Help menu
+        action_about = QtGui.QAction('&About', self,
+                                     statusTip="Show the application's About box",
+                                     triggered=self.about)
 
         action_about_qt = QtGui.QAction('&About Qt', self,
                                         statusTip="Show the Qt library's About box",
@@ -193,8 +199,16 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         menu_play_types.addAction(action_play_types_albums)
         menu_play_types.addAction(action_play_types_songs)
 
-        # menu_about.addAction(action_about)
+        menu_about.addAction(action_about)
         menu_about.addAction(action_about_qt)
+
+    def about(self):
+        message = ("<h3><b>gmusicstatistics %s</b></h3>"
+                   "<b>Build Date:</b> %s"
+                   "<br />Developed by Stefen Sharkey"
+                   "<br /><a href=\"https://github.com/Stefenatefun/gmusicstatistics\">GitHub</a>" %
+                   (gmusicstatistics_version, gmusicstatistics_build_date))
+        QtGui.QMessageBox.about(self, "About gmusicstatistics", message)
 
     def init_search(self):
         for song in api.get_all_songs(False, False):

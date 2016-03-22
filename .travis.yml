@@ -1,0 +1,26 @@
+language: python
+python:
+  - '2.7'
+before_install:
+  - wget http://sourceforge.net/projects/pyqt/files/sip/sip-4.17/sip-4.17.tar.gz
+  - wget http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/PyQt-x11-gpl-4.11.4.tar.gz
+  - tar zxf sip-4.17.tar.gz
+  - tar zxf PyQt-x11-gpl-4.11.4.tar.gz
+  - cd sip-4.17
+  - python configure.py
+  - make
+  - sudo make install
+  - cd ..
+  - cd PyQt-x11-gpl-4.11.4
+  - echo 'yes' | python configure-ng.py
+  - make
+  - sudo make install
+install:
+  - sudo pip install gmusicapi
+script: nosetests
+notifications:
+  recipients:
+    - stefenatefun@gmail.com
+branches:
+  only:
+    - master

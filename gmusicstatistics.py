@@ -194,7 +194,7 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
             temp = self.str_to_json(song, single_to_double=True)
 
             if debug:
-                print temp + ","
+                print(temp + ",")
 
             self.add_all_plays(temp)
 
@@ -240,8 +240,8 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         data.update([('Total Time (HH:MM:SS)', self.fill_formatted_total_time(data['Total Time']))])
 
         if debug:
-            print data['Total Time']
-            print data.keys()
+            print(data['Total Time'])
+            print(data.keys())
 
         self.scroll_table = QtGui.QTableWidget(len(data[data.keys()[0]]), len(data))
         self.scroll.setWidget(self.scroll_table)
@@ -253,11 +253,11 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
 
         for x, key in enumerate(data.keys()):
             if debug:
-                print unicode(x) + ' ' + unicode(key)
+                print(unicode(x) + ' ' + unicode(key))
 
             for y, value in enumerate(data[key]):
                 if debug:
-                    print unicode(y) + ' ' + unicode(value)
+                    print(unicode(y) + ' ' + unicode(value))
                 genre = TableWidgetItem(unicode(value), value)
                 self.scroll_table.setItem(y, x, genre)
 
@@ -271,7 +271,7 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
 
         for index, time in enumerate(data):
             if debug:
-                print data
+                print(data)
             new_data.append(self.format_time(seconds=time))
 
         return new_data
@@ -356,9 +356,9 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
 
     def format_time(self, hours=int, minutes=int, seconds=int, millis=int):
         if debug:
-            print type(millis)
-            print millis
-            print type(seconds)
+            print(type(millis))
+            print(millis)
+            print(type(seconds))
 
         if ((type(hours) is type or hours == 0) and (type(minutes) is type or minutes == 0) and
                 (type(seconds) is type or seconds == 0) and (type(millis) is type or millis == 0)):
@@ -375,7 +375,7 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         time_formatted = "%02d:%02d:%02d" % (hours_formatted, minutes_formatted, seconds_formatted)
 
         if debug:
-            print time_formatted
+            print(time_formatted)
 
         return time_formatted
 

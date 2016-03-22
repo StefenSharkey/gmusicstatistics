@@ -13,6 +13,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from __future__ import division
 from collections import OrderedDict
 from gmusicapi import Mobileclient
 from PyQt4 import QtCore, QtGui
@@ -367,7 +368,7 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
             if type(seconds) is type:
                 seconds = 0
 
-            seconds += self.millis_to_seconds(millis, truncate=True)
+            seconds += self.millis_to_seconds(millis)
 
         minutes_formatted, seconds_formatted = divmod(seconds, 60)
         hours_formatted, minutes_formatted = divmod(minutes_formatted, 60)
@@ -379,9 +380,9 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         return time_formatted
 
     @staticmethod
-    def millis_to_seconds(millis, truncate=False):
+    def millis_to_seconds(millis, truncate=True):
         seconds = millis / 1000
-        return seconds if truncate else seconds
+        return int(seconds) if truncate else seconds
 
     @staticmethod
     def str_to_json(string, single_to_double=False):

@@ -270,9 +270,6 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         self.scroll_table.clearContents()
         self.scroll_table.setHorizontalHeaderLabels(data.keys())
 
-        # for index, time in enumerate(data['Total Time']):
-        #     data['Total Time'][index] = self.millis_to_seconds(int(time), truncate=True)
-
         for x, key in enumerate(data.keys()):
             if debug:
                 print(unicode(x) + ' ' + unicode(key))

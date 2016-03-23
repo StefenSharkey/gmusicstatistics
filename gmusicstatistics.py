@@ -35,7 +35,7 @@ debug = False
 
 create_file = False
 
-gmusicstatistics_version = "0.1"
+gmusicstatistics_version = "0.1.0"
 gmusicstatistics_build_date = "March 22, 2016"
 
 api = Mobileclient()

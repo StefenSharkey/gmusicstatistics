@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 """
 Copyright 2016 Stefen Sharkey
@@ -17,43 +16,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from __future__ import division
-from collections import OrderedDict
-from gmusicapi import Mobileclient
-from PyQt4 import QtCore, QtGui
-
 import json
 import os
 import sys
+from collections import OrderedDict
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import qApp, QAction, QActionGroup, QApplication, QLabel, QMainWindow, QMenu, QMessageBox, \
+    QScrollArea, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
+from gmusicapi import Mobileclient
 
 # NOTE: Debug mode makes processing VERY slow.
 debug = False
 
 create_file = False
 
-gmusicstatistics_version = "0.1.0"
-gmusicstatistics_build_date = "March 22, 2016"
+gmusicstatistics_version = "0.1.1"
+gmusicstatistics_build_date = "May 29, 2020"
 
 api = Mobileclient()
 
-genre_plays = OrderedDict([('Genre', []), ('Total Plays', []), ('Total Time', [])])
+genre_plays = OrderedDict([("Genre", []), ("Total Plays", []), ("Total Time", [])])
 genre_name = []
 genre_total_plays = []
 genre_total_time = []
 
-artist_plays = OrderedDict([('Artist', []), ('Total Plays', []), ('Total Time', [])])
+artist_plays = OrderedDict([("Artist", []), ("Total Plays", []), ("Total Time", [])])
 artist_name = []
 artist_total_plays = []
 artist_total_time = []
 
-album_plays = OrderedDict([('Artist', []), ('Album', []), ('Total Plays', []), ('Total Time', [])])
+album_plays = OrderedDict([("Artist", []), ("Album", []), ("Total Plays", []), ("Total Time", [])])
 album_artist = []
 album_name = []
 album_total_plays = []
 album_total_time = []
 
-song_plays = OrderedDict([('Artist', []), ('Album', []), ('Song', []), ('Total Plays', []), ('Total Time', [])])
+song_plays = OrderedDict([("Artist", []), ("Album", []), ("Song", []), ("Total Plays", []), ("Total Time", [])])
 song_artist = []
 song_album = []
 song_name = []
@@ -61,29 +60,29 @@ song_total_plays = []
 song_total_time = []
 
 
-class GoogleMusicStatistics(QtGui.QMainWindow):
+class GoogleMusicStatistics(QMainWindow):
     # String containing all the songs.
-    songs = ''
+    songs = ""
 
     # Pretty-printed string containing all the songs.
-    songs_pprint = ''
+    songs_pprint = ""
 
     # Total time listened to music.
     time_listened_total = 0
 
     data = OrderedDict({})
 
-    gui = QtGui.QApplication(sys.argv)
-    main_widget = QtGui.QWidget()
-    main_layout = QtGui.QVBoxLayout()
-    scroll = QtGui.QScrollArea()
-    scroll_layout = QtGui.QVBoxLayout()
-    scroll_table = QtGui.QTableWidget()
-    scroll_contents = QtGui.QWidget()
-    scroll_contents_layout = QtGui.QVBoxLayout()
-    text = QtGui.QLabel()
+    gui = QApplication(sys.argv)
+    main_widget = QWidget()
+    main_layout = QVBoxLayout()
+    scroll = QScrollArea()
+    scroll_layout = QVBoxLayout()
+    scroll_table = QTableWidget()
+    scroll_contents = QWidget()
+    scroll_contents_layout = QVBoxLayout()
+    text = QLabel()
 
-    def __init__(self, data):
+    def __init__(self, data: OrderedDict):
         super(GoogleMusicStatistics, self).__init__()
 
         self.data = data
@@ -100,10 +99,10 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
 
     @staticmethod
     def init_file():
-        if os.path.isfile('songlist.json'):
-            os.remove('songlist.json')
+        if os.path.isfile("songlist.json"):
+            os.remove("songlist.json")
 
-        return open('songlist.json', 'w')
+        return open("songlist.json", "w")
 
     def init_ui(self):
         self.setCentralWidget(self.main_widget)
@@ -112,81 +111,77 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         self.main_layout.addWidget(self.scroll)
         self.main_layout.addWidget(self.text)
 
-        self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.scroll.setWidgetResizable(True)
 
         self.scroll.setLayout(self.scroll_layout)
 
         self.scroll_contents.setLayout(self.scroll_contents_layout)
 
-        self.setWindowTitle('Google Play Music Statistics')
+        self.setWindowTitle("Google Play Music Statistics")
         self.init_menu()
         self.center()
         self.show()
 
     def init_menu(self):
-        menu_file = self.menu.addMenu('&File')
-        menu_view = self.menu.addMenu('&View')
-        menu_about = self.menu.addMenu('&Help')
+        menu_file = self.menu.addMenu("&File")
+        menu_view = self.menu.addMenu("&View")
+        menu_about = self.menu.addMenu("&Help")
 
-        menu_play_types = QtGui.QMenu()
-        play_types_group = QtGui.QActionGroup(self)
+        menu_play_types = QMenu()
+        play_types_group = QActionGroup(self)
 
         # File menu
-        action_quit = QtGui.QAction('&Exit', self,
-                                    shortcut='Ctrl+W',
-                                    statusTip='Exit application',
-                                    triggered=self.close)
+        action_quit = QAction("&Exit", self,
+                              shortcut="Ctrl+W",
+                              statusTip="Exit application",
+                              triggered=self.close)
 
         # View menu
-        action_play_types = QtGui.QAction('&Play Types', self)
+        action_play_types = QAction("&Play Types", self)
         action_play_types.setMenu(menu_play_types)
 
-        action_play_types_genres = QtGui.QAction('&Genres', self)
+        action_play_types_genres = QAction("&Genres", self)
         action_play_types_genres.setCheckable(True)
         action_play_types_genres.setActionGroup(play_types_group)
         if self.music_dict.get_music_dict() == genre_plays:
             self.scroll_table.clearSelection()
             action_play_types_genres.setChecked(True)
-        QtCore.QObject.connect(action_play_types_genres, QtCore.SIGNAL('triggered()'),
-                               lambda: self.fill_table(genre_plays))
+        action_play_types_genres.triggered.connect(lambda: self.fill_table(genre_plays))
 
-        action_play_types_artists = QtGui.QAction('&Artists', self)
+        action_play_types_artists = QAction("&Artists", self)
         action_play_types_artists.setCheckable(True)
         action_play_types_artists.setActionGroup(play_types_group)
         if self.music_dict.get_music_dict() == artist_plays:
             self.scroll_table.clearSelection()
             action_play_types_artists.setChecked(True)
-        QtCore.QObject.connect(action_play_types_artists, QtCore.SIGNAL('triggered()'),
-                               lambda: self.fill_table(artist_plays))
+        action_play_types_artists.triggered.connect(lambda: self.fill_table(artist_plays))
 
-        action_play_types_albums = QtGui.QAction('&Albums', self)
+        action_play_types_albums = QAction("&Albums", self)
         action_play_types_albums.setCheckable(True)
         action_play_types_albums.setActionGroup(play_types_group)
         if self.music_dict.get_music_dict() == album_plays:
             self.scroll_table.clearSelection()
             action_play_types_albums.setChecked(True)
-        QtCore.QObject.connect(action_play_types_albums, QtCore.SIGNAL('triggered()'),
-                               lambda: self.fill_table(album_plays))
+        action_play_types_albums.triggered.connect(lambda: self.fill_table(album_plays))
 
-        action_play_types_songs = QtGui.QAction('&Songs', self)
+        action_play_types_songs = QAction("&Songs", self)
         action_play_types_songs.setCheckable(True)
         action_play_types_songs.setActionGroup(play_types_group)
         if self.music_dict.get_music_dict() == song_plays:
             self.scroll_table.clearSelection()
             action_play_types_songs.setChecked(True)
-        QtCore.QObject.connect(action_play_types_songs, QtCore.SIGNAL('triggered()'),
-                               lambda: self.fill_table(song_plays))
+        action_play_types_songs.triggered.connect(lambda: self.fill_table(song_plays))
 
         # Help menu
-        action_about = QtGui.QAction('&About', self,
-                                     statusTip="Show the application's About box",
-                                     triggered=self.about)
+        action_about = QAction("&About", self,
+                               statusTip="Show the application's About box",
+                               triggered=self.about)
 
-        action_about_qt = QtGui.QAction('&About Qt', self,
-                                        statusTip="Show the Qt library's About box",
-                                        triggered=QtGui.qApp.aboutQt)
+        action_about_qt = QAction("&About Qt", self,
+                                  statusTip="Show the Qt library's About box",
+                                  triggered=qApp.aboutQt)
 
         menu_file.addAction(action_quit)
 
@@ -205,80 +200,80 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
                    "<br />Developed by Stefen Sharkey"
                    "<br /><a href=\"https://github.com/Stefenatefun/gmusicstatistics\">GitHub</a>" %
                    (gmusicstatistics_version, gmusicstatistics_build_date))
-        QtGui.QMessageBox.about(self, "About gmusicstatistics", message)
+        QMessageBox.about(self, "About gmusicstatistics", message)
 
     def init_search(self):
-        for song in api.get_all_songs(False, False):
-            # TODO: Figure out a way that doesn't involve manually replacing chars.
-            temp = self.str_to_json(song, single_to_double=True)
+        for song in api.get_all_songs(incremental=False):
+            temp = json.dumps(song)
 
             if debug:
-                print(temp + ",")
+                print(str(temp))
 
             self.add_all_plays(temp)
 
-            self.songs += temp + ',\n'
+            self.songs += temp + ",\n"
 
             # Pretty-prints the song entry.
-            temp = json.dumps(json.loads(temp, encoding='utf8'), indent=4, encoding='utf8')
+            temp = json.dumps(json.loads(temp), indent=4)
 
             # Adds the time played from current song to total time.
             self.time_listened_total += self.add_total_plays(temp)
 
             if create_file:
-                self.songs_pprint += temp + ',\n'
+                self.songs_pprint += temp + ",\n"
 
         if create_file:
             self.file.write(self.songs_pprint)
             self.file.close()
 
-        self.text.setText(self.format_time(seconds=self.time_listened_total))
+        self.text.setText(self.format_seconds_to_time(self.time_listened_total))
 
     @staticmethod
     def fill_all_arrays():
-        genre_plays['Genre'] = genre_name
-        genre_plays['Total Plays'] = genre_total_plays
-        genre_plays['Total Time'] = genre_total_time
+        genre_plays["Genre"] = genre_name
+        genre_plays["Total Plays"] = genre_total_plays
+        genre_plays["Total Time"] = genre_total_time
 
-        artist_plays['Artist'] = artist_name
-        artist_plays['Total Plays'] = artist_total_plays
-        artist_plays['Total Time'] = artist_total_time
+        artist_plays["Artist"] = artist_name
+        artist_plays["Total Plays"] = artist_total_plays
+        artist_plays["Total Time"] = artist_total_time
 
-        album_plays['Artist'] = album_artist
-        album_plays['Album'] = album_name
-        album_plays['Total Plays'] = album_total_plays
-        album_plays['Total Time'] = album_total_time
+        album_plays["Artist"] = album_artist
+        album_plays["Album"] = album_name
+        album_plays["Total Plays"] = album_total_plays
+        album_plays["Total Time"] = album_total_time
 
-        song_plays['Artist'] = song_artist
-        song_plays['Album'] = song_album
-        song_plays['Song'] = song_name
-        song_plays['Total Plays'] = song_total_plays
-        song_plays['Total Time'] = song_total_time
+        song_plays["Artist"] = song_artist
+        song_plays["Album"] = song_album
+        song_plays["Song"] = song_name
+        song_plays["Total Plays"] = song_total_plays
+        song_plays["Total Time"] = song_total_time
 
     def fill_table(self, data):
-        data.update([('Total Time (HH:MM:SS)', self.fill_formatted_total_time(data['Total Time']))])
+        data.update([("Total Time (HH:MM:SS)", self.fill_formatted_total_time(data["Total Time"]))])
 
         if debug:
-            print(data['Total Time'])
+            print(data["Total Time"])
             print(data.keys())
 
-        self.scroll_table = QtGui.QTableWidget(len(data[data.keys()[0]]), len(data))
+        self.scroll_table = QTableWidget(len(data[list(data.keys())[0]]), len(data))
         self.scroll.setWidget(self.scroll_table)
         self.scroll_table.clearContents()
         self.scroll_table.setHorizontalHeaderLabels(data.keys())
 
         for x, key in enumerate(data.keys()):
             if debug:
-                print(unicode(x) + ' ' + unicode(key))
+                print(x, " ", key)
 
             for y, value in enumerate(data[key]):
                 if debug:
-                    print(unicode(y) + ' ' + unicode(value))
-                genre = TableWidgetItem(unicode(value), value)
+                    print(y, " ", value)
+
+                genre = TableWidgetItem(str(value), value)
                 self.scroll_table.setItem(y, x, genre)
 
         self.scroll_table.setSortingEnabled(True)
-        self.scroll_table.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        self.scroll_table.sortByColumn(0, Qt.AscendingOrder)
         self.scroll_table.resizeColumnsToContents()
 
     def fill_formatted_total_time(self, data):
@@ -288,103 +283,106 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         for index, time in enumerate(data):
             if debug:
                 print(data)
-            new_data.append(self.format_time(seconds=time))
+            new_data.append(self.format_seconds_to_time(time))
 
         return new_data
 
     def add_total_plays(self, songs):
         # Creates a JSON database of the current song.
-        song = json.loads(songs, encoding='utf8')
+        song = json.loads(songs)
 
         # Multiplies play count by the duration in milliseconds.
-        return song['playCount'] * self.millis_to_seconds(int(song['durationMillis']))
+        try:
+            return int(song["playCount"]) * self.millis_to_seconds(int(song["durationMillis"]))
+        except KeyError:
+            return 0
 
-    def add_all_plays(self, song):
+    def add_all_plays(self, song: str):
         # Creates a JSON database of the current song.
-        song = json.loads(song, encoding='utf8')
+        song = json.loads(song)
 
         # Creates entry for required info if it doesn't exist.
-        if not genre_name.__contains__(song['genre']):
-            genre_name.append(song['genre'])
-        if not artist_name.__contains__(song['artist']):
-            artist_name.append(song['artist'])
-        if not album_name.__contains__(song['album']):
-            album_name.append(song['album'])
-        # if not song_name.__contains__(song['title']):
-        song_name.append(song['title'])
+        try:
+            if not genre_name.__contains__(song["genre"]):
+                genre_name.append(song["genre"])
+        except KeyError:
+            if not genre_name.__contains__(""):
+                genre_name.append("")
+
+        if not artist_name.__contains__(song["artist"]):
+            artist_name.append(song["artist"])
+        if not album_name.__contains__(song["album"]):
+            album_name.append(song["album"])
+        song_name.append(song["title"])
 
         # Indexes.
-        index_genre = genre_name.index(song['genre'])
-        index_artist = artist_name.index(song['artist'])
-        index_album = album_name.index(song['album'])
+        index_genre = genre_name.index(song["genre"] if "genre" in song else "")
+        index_artist = artist_name.index(song["artist"])
+        index_album = album_name.index(song["album"])
         index_song = len(song_name) - 1
+
+        try:
+            play_count = int(song["playCount"])
+        except KeyError:
+            play_count = 0
 
         # Writes the total play count.
         if not len(genre_total_plays) == len(genre_name):
             genre_total_plays.append(0)
-        genre_total_plays[index_genre] += int(song['playCount'])
+        genre_total_plays[index_genre] += play_count
 
         if not len(artist_total_plays) == len(artist_name):
             artist_total_plays.append(0)
-        artist_total_plays[index_artist] += int(song['playCount'])
+        artist_total_plays[index_artist] += play_count
 
         if not len(album_total_plays) == len(album_name):
             album_total_plays.append(0)
-        album_total_plays[index_album] += int(song['playCount'])
+        album_total_plays[index_album] += play_count
 
         if not len(song_total_plays) == len(song_name):
             song_total_plays.append(0)
-        song_total_plays[index_song] += int(song['playCount'])
+        song_total_plays[index_song] += play_count
 
         # Writes the total time played.
         if not len(genre_total_time) == len(genre_total_plays):
             genre_total_time.append(0)
-        genre_total_time[index_genre] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
+        genre_total_time[index_genre] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
         if not len(artist_total_time) == len(artist_total_plays):
             artist_total_time.append(0)
-        artist_total_time[index_artist] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
+        artist_total_time[index_artist] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
         if not len(album_total_time) == len(album_total_plays):
             album_total_time.append(0)
-        album_total_time[index_album] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
+        album_total_time[index_album] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
         if not len(song_total_time) == len(song_total_plays):
             song_total_time.append(0)
-        song_total_time[index_song] += int(song['playCount']) * self.millis_to_seconds(int(song['durationMillis']))
+        song_total_time[index_song] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
         # Artist for album view.
         if not len(album_artist) == len(album_total_time):
-            album_artist.append(song['artist'])
+            album_artist.append(song["artist"])
 
         # Artist and album for song view.
         if not len(song_artist) == len(song_total_time):
-            song_artist.append(song['artist'])
+            song_artist.append(song["artist"])
         if not len(song_album) == len(song_artist):
-            song_album.append(song['album'])
+            song_album.append(song["album"])
 
     def center(self):
         frame_geometry = self.frameGeometry()
-        screen = QtGui.QApplication.desktop()
-        center_point = QtGui.QApplication.desktop().screenGeometry(screen).center()
+        screen = QApplication.desktop()
+        center_point = QApplication.desktop().screenGeometry(screen).center()
         frame_geometry.moveCenter(center_point)
         self.move(frame_geometry.topLeft())
 
-    def format_time(self, hours=int, minutes=int, seconds=int, millis=int):
+    def format_seconds_to_time(self, seconds: int):
         if debug:
-            print(type(millis))
-            print(millis)
-            print(type(seconds))
+            print(seconds)
 
-        if ((type(hours) is type or hours == 0) and (type(minutes) is type or minutes == 0) and
-                (type(seconds) is type or seconds == 0) and (type(millis) is type or millis == 0)):
+        if seconds == 0:
             return "00:00:00"
-
-        if type(millis) is not type and millis > 0:
-            if type(seconds) is type:
-                seconds = 0
-
-            seconds += self.millis_to_seconds(millis)
 
         minutes_formatted, seconds_formatted = divmod(seconds, 60)
         hours_formatted, minutes_formatted = divmod(minutes_formatted, 60)
@@ -396,184 +394,79 @@ class GoogleMusicStatistics(QtGui.QMainWindow):
         return time_formatted
 
     @staticmethod
-    def millis_to_seconds(millis, truncate=True):
-        seconds = millis / 1000
-        return int(seconds) if truncate else seconds
-
-    @staticmethod
-    def str_to_json(string, single_to_double=False):
-        string = str(string)
-
-        if single_to_double:
-            string = string.replace('"', "'")
-
-        return (string.replace("\\'", "'")
-                .replace("{u'", '{"')
-                .replace(": u'", ': "')
-                .replace(': u"', ': "')
-                .replace(", u'", ', "')
-                .replace("[u'", '["')
-                .replace("':", '":')
-                .replace("',", '",')
-                .replace("'}", '"}')
-                .replace("']", '"]')
-                .replace('\\u00fc', 'ü')
-                .replace('\\u0142a', 'ł')
-                .replace('\\u0107', 'ć')
-                .replace('\\u0119', 'ę')
-                .replace('\\u0144', 'ń')
-                .replace('\\xa1', '¡')
-                .replace('\\xb0', '°')
-                .replace('\\xb4', '`')  # TODO: Consider making this a standard apostrophe.
-                .replace('\\xc6', 'Æ')
-                .replace('\\xe3', 'ã')
-                .replace('\\xe4', 'ä')
-                .replace('\\xe5', 'å')
-                .replace('\\xe6', 'æ')
-                .replace('\\xe7', 'ç')
-                .replace('\\xe9', 'é')
-                .replace('\\xf1', 'ñ')
-                .replace('\\xf3w', 'ó')
-                .replace('\\xf6', 'ö')
-                .replace('\\xfc', 'ü')
-                .replace('\\xff', 'ÿ')
-                .replace(': False', ': "False"')
-                .replace(': True', ': "True"'))
+    def millis_to_seconds(millis: int):
+        return int(millis / 1000)
 
 
 class MusicDict:
     music_play_type = OrderedDict({})
 
-    def __init__(self, data):
+    def __init__(self, data: OrderedDict):
         self.music_play_type = data
 
     def get_music_dict(self):
         return self.music_play_type
 
     def get_descriptor(self):
-        if self.music_play_type == genre_plays:
-            return 'genre'
-        elif self.music_play_type == artist_plays:
-            return 'artist'
-        elif self.music_play_type == album_plays:
-            return 'album'
-        elif self.music_play_type == song_plays:
-            return 'title'
-        else:
-            sys.exit('Descriptor not found.')
+        switch = {
+            genre_plays: "genre",
+            artist_plays: "artist",
+            album_plays: "album",
+            song_plays: "title"
+        }
+
+        return switch.get(self.music_play_type, lambda: sys.exit("Descriptor not found."))
 
     def get_descriptor_array(self):
-        if self.music_play_type == genre_plays:
-            return genre_name
-        elif self.music_play_type == artist_plays:
-            return artist_name
-        elif self.music_play_type == album_plays:
-            return album_name
-        elif self.music_play_type == song_plays:
-            return song_name
-        else:
-            sys.exit('Descriptor array not found.')
+        switch = {
+            genre_plays: genre_name,
+            artist_plays: artist_name,
+            album_plays: album_name,
+            song_plays: song_name
+        }
+
+        return switch.get(self.music_play_type, lambda: sys.exit("Descriptor array not found."))
 
     def get_total_plays_array(self):
-        if self.music_play_type == genre_plays:
-            return genre_total_plays
-        elif self.music_play_type == artist_plays:
-            return artist_total_plays
-        elif self.music_play_type == album_plays:
-            return album_total_plays
-        elif self.music_play_type == song_plays:
-            return song_total_plays
-        else:
-            sys.exit('Total plays array not found.')
+        switch = {
+            genre_plays: genre_total_plays,
+            artist_plays: artist_total_plays,
+            album_plays: album_total_plays,
+            song_plays: song_total_plays
+        }
+
+        return switch.get(self.music_play_type, lambda: sys.exit("Total plays array not found."))
 
     def get_total_time_array(self):
-        if self.music_play_type == genre_plays:
-            return genre_total_time
-        elif self.music_play_type == artist_plays:
-            return artist_total_time
-        elif self.music_play_type == album_plays:
-            return album_total_time
-        elif self.music_play_type == song_plays:
-            return song_total_time
-        else:
-            sys.exit('Total time array not found.')
+        switch = {
+            genre_plays: genre_total_time,
+            artist_plays: artist_total_time,
+            album_plays: album_total_time,
+            song_plays: song_total_time
+        }
+
+        return switch.get(self.music_play_type, lambda: sys.exit("Total time array not found."))
 
 
-class TableWidgetItem(QtGui.QTableWidgetItem):
-    def __init__(self, text, sort_key):
-        QtGui.QTableWidgetItem.__init__(self, text, QtGui.QTableWidgetItem.UserType)
+class TableWidgetItem(QTableWidgetItem):
+
+    def __init__(self, text, sort_key: int):
+        super().__init__(text)
         self.sort_key = sort_key
 
-    def __lt__(self, other):
+    def __lt__(self, other: QTableWidgetItem):
         return self.sort_key < other.sort_key
 
 
-class LoginWindow(QtGui.QDialog):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.app = QtGui.QApplication(sys.argv)
-        self.layout = QtGui.QVBoxLayout()
-        username = QtGui.QWidget()
-        username_layout = QtGui.QHBoxLayout()
-        username_label = QtGui.QLabel('Username')
-        self.username_text = QtGui.QLineEdit()
-        password = QtGui.QWidget()
-        password_layout = QtGui.QHBoxLayout()
-        password_label = QtGui.QLabel('Password')
-        self.password_text = QtGui.QLineEdit()
-        self.error_message = QtGui.QLabel()
-        button = QtGui.QWidget()
-        button_layout = QtGui.QHBoxLayout()
-        self.button_okay = QtGui.QPushButton('Okay')
-        self.button_cancel = QtGui.QPushButton('Cancel')
-
-        self.password_text.setEchoMode(QtGui.QLineEdit.Password)
-
-        username.setLayout(username_layout)
-        username_layout.addWidget(username_label)
-        username_layout.addWidget(self.username_text)
-
-        password.setLayout(password_layout)
-        password_layout.addWidget(password_label)
-        password_layout.addWidget(self.password_text)
-
-        self.error_message.setStyleSheet('QLabel { color: red; }')
-
-        button.setLayout(button_layout)
-        button_layout.addWidget(self.button_okay)
-        button_layout.addWidget(self.button_cancel)
-
-        QtCore.QObject.connect(self.button_okay, QtCore.SIGNAL('clicked()'), self.button_clicked)
-        QtCore.QObject.connect(self.button_cancel, QtCore.SIGNAL('clicked()'), self.button_clicked)
-
-        self.layout.addWidget(username)
-        self.layout.addWidget(password)
-        self.layout.addWidget(self.error_message)
-        self.layout.addWidget(button)
-        self.setLayout(self.layout)
-
-        self.layout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
-        self.setSizeGripEnabled(False)
-        self.setWindowTitle('Login to Google')
-        self.show()
-        self.app.exec_()
-
-    def button_clicked(self):
-        if self.sender() == self.button_okay:
-            if not api.login(str(self.username_text.text()), str(self.password_text.text()),
-                             Mobileclient.FROM_MAC_ADDRESS):
-                self.error_message.setText('Username and/or password incorrect.')
-            else:
-                self.done(0)
-        elif self.sender() == self.button_cancel:
-            sys.exit()
-
-
 def main():
-    LoginWindow()
-    app = QtGui.QApplication(sys.argv)
-    GoogleMusicStatistics(genre_plays)
+    if not api.oauth_login(api.FROM_MAC_ADDRESS):
+        api.perform_oauth(open_browser=True)
+
+    # LoginWindow()
+    app = QApplication(sys.argv)
+    ex = GoogleMusicStatistics(genre_plays)
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()

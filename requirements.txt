@@ -1,2 +1,3 @@
 gmusicapi >= 13.0.0
+pandas
 PyQt5

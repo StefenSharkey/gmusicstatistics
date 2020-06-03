@@ -21,6 +21,7 @@ import os
 import sys
 from collections import OrderedDict
 
+import pandas as pd
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import qApp, QAction, QActionGroup, QApplication, QLabel, QMainWindow, QMenu, QMessageBox, \
     QScrollArea, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
@@ -71,6 +72,8 @@ class GoogleMusicStatistics(QMainWindow):
     time_listened_total = 0
 
     data = OrderedDict({})
+
+    active_table = "genre"
 
     gui = QApplication(sys.argv)
     main_widget = QWidget()
@@ -133,6 +136,11 @@ class GoogleMusicStatistics(QMainWindow):
         play_types_group = QActionGroup(self)
 
         # File menu
+        action_export_to_csv = QAction("&Export to CSV...", self,
+                                       shortcut="Ctrl+S",
+                                       statusTip="Export content to a CSV file.",
+                                       triggered=lambda: self.export_to_csv())
+
         action_quit = QAction("&Exit", self,
                               shortcut="Ctrl+W",
                               statusTip="Exit application",
@@ -183,6 +191,7 @@ class GoogleMusicStatistics(QMainWindow):
                                   statusTip="Show the Qt library's About box",
                                   triggered=qApp.aboutQt)
 
+        menu_file.addAction(action_export_to_csv)
         menu_file.addAction(action_quit)
 
         menu_view.addMenu(menu_play_types)
@@ -249,7 +258,10 @@ class GoogleMusicStatistics(QMainWindow):
         song_plays["Total Plays"] = song_total_plays
         song_plays["Total Time"] = song_total_time
 
-    def fill_table(self, data):
+    def fill_table(self, data: OrderedDict, active_table: str = None):
+        if active_table is not None:
+            self.active_table = active_table
+
         data.update([("Total Time (HH:MM:SS)", self.fill_formatted_total_time(data["Total Time"]))])
 
         if debug:
@@ -369,6 +381,16 @@ class GoogleMusicStatistics(QMainWindow):
             song_artist.append(song["artist"])
         if not len(song_album) == len(song_artist):
             song_album.append(song["album"])
+
+    def export_to_csv(self):
+        active_dict = ({
+            "genre": genre_plays,
+            "artist": artist_plays,
+            "album": album_plays,
+            "song": song_plays
+        }).get(self.active_table)
+
+        pd.DataFrame.from_dict(active_dict).to_csv("gmusicstatistics.csv", index=False)
 
     def center(self):
         frame_geometry = self.frameGeometry()

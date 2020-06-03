@@ -90,7 +90,6 @@ class GoogleMusicStatistics(QMainWindow):
 
         self.data = data
         self.menu = self.menuBar()
-        self.music_dict = MusicDict(data)
 
         if create_file:
             self.file = self.init_file()
@@ -418,56 +417,6 @@ class GoogleMusicStatistics(QMainWindow):
     @staticmethod
     def millis_to_seconds(millis: int):
         return int(millis / 1000)
-
-
-class MusicDict:
-    music_play_type = OrderedDict({})
-
-    def __init__(self, data: OrderedDict):
-        self.music_play_type = data
-
-    def get_music_dict(self):
-        return self.music_play_type
-
-    def get_descriptor(self):
-        switch = {
-            genre_plays: "genre",
-            artist_plays: "artist",
-            album_plays: "album",
-            song_plays: "title"
-        }
-
-        return switch.get(self.music_play_type, lambda: sys.exit("Descriptor not found."))
-
-    def get_descriptor_array(self):
-        switch = {
-            genre_plays: genre_name,
-            artist_plays: artist_name,
-            album_plays: album_name,
-            song_plays: song_name
-        }
-
-        return switch.get(self.music_play_type, lambda: sys.exit("Descriptor array not found."))
-
-    def get_total_plays_array(self):
-        switch = {
-            genre_plays: genre_total_plays,
-            artist_plays: artist_total_plays,
-            album_plays: album_total_plays,
-            song_plays: song_total_plays
-        }
-
-        return switch.get(self.music_play_type, lambda: sys.exit("Total plays array not found."))
-
-    def get_total_time_array(self):
-        switch = {
-            genre_plays: genre_total_time,
-            artist_plays: artist_total_time,
-            album_plays: album_total_time,
-            song_plays: song_total_time
-        }
-
-        return switch.get(self.music_play_type, lambda: sys.exit("Total time array not found."))
 
 
 class TableWidgetItem(QTableWidgetItem):

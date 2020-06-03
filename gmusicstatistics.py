@@ -19,7 +19,6 @@ limitations under the License.
 import json
 import os
 import sys
-from collections import OrderedDict
 
 import pandas as pd
 from PyQt5.QtCore import Qt
@@ -37,28 +36,10 @@ gmusicstatistics_build_date = "May 29, 2020"
 
 api = Mobileclient()
 
-genre_plays = OrderedDict([("Genre", []), ("Total Plays", []), ("Total Time", [])])
-genre_name = []
-genre_total_plays = []
-genre_total_time = []
-
-artist_plays = OrderedDict([("Artist", []), ("Total Plays", []), ("Total Time", [])])
-artist_name = []
-artist_total_plays = []
-artist_total_time = []
-
-album_plays = OrderedDict([("Artist", []), ("Album", []), ("Total Plays", []), ("Total Time", [])])
-album_artist = []
-album_name = []
-album_total_plays = []
-album_total_time = []
-
-song_plays = OrderedDict([("Artist", []), ("Album", []), ("Song", []), ("Total Plays", []), ("Total Time", [])])
-song_artist = []
-song_album = []
-song_name = []
-song_total_plays = []
-song_total_time = []
+plays = dict([("Genre", dict([("Genre", []), ("Total Plays", []), ("Total Time", [])])),
+             ("Artist", dict([("Artist", []), ("Total Plays", []), ("Total Time", [])])),
+             ("Album", dict([("Artist", []), ("Album", []), ("Total Plays", []), ("Total Time", [])])),
+             ("Song", dict([("Artist", []), ("Album", []), ("Song", []), ("Total Plays", []), ("Total Time", [])]))])
 
 
 class GoogleMusicStatistics(QMainWindow):
@@ -71,9 +52,7 @@ class GoogleMusicStatistics(QMainWindow):
     # Total time listened to music.
     time_listened_total = 0
 
-    data = OrderedDict({})
-
-    active_table = "genre"
+    active_table: str
 
     gui = QApplication(sys.argv)
     main_widget = QWidget()
@@ -85,18 +64,17 @@ class GoogleMusicStatistics(QMainWindow):
     scroll_contents_layout = QVBoxLayout()
     text = QLabel()
 
-    def __init__(self, data: OrderedDict):
+    def __init__(self, data: dict, active_table: str):
         super(GoogleMusicStatistics, self).__init__()
 
-        self.data = data
         self.menu = self.menuBar()
+        self.active_table = active_table
 
         if create_file:
             self.file = self.init_file()
 
         self.init_ui()
         self.init_search()
-        self.fill_all_arrays()
         self.fill_table(data)
 
     @staticmethod
@@ -151,16 +129,16 @@ class GoogleMusicStatistics(QMainWindow):
 
         action_play_types_genres = QAction("&Genres", play_types_group,
                                            checkable=True,
-                                           triggered=lambda: self.fill_table(genre_plays, "genres"))
+                                           triggered=lambda: self.fill_table(plays["Genre"], "genre"))
         action_play_types_artists = QAction("&Artists", play_types_group,
                                             checkable=True,
-                                            triggered=lambda: self.fill_table(artist_plays, "artists"))
+                                            triggered=lambda: self.fill_table(plays["Artist"], "artist"))
         action_play_types_albums = QAction("&Albums", play_types_group,
                                            checkable=True,
-                                           triggered=lambda: self.fill_table(album_plays, "albums"))
+                                           triggered=lambda: self.fill_table(plays["Album"], "album"))
         action_play_types_songs = QAction("&Songs", play_types_group,
                                           checkable=True,
-                                          triggered=lambda: self.fill_table(song_plays, "songs"))
+                                          triggered=lambda: self.fill_table(plays["Song"], "song"))
 
         action_play_types_genres.setChecked(True)
 
@@ -219,28 +197,7 @@ class GoogleMusicStatistics(QMainWindow):
 
         self.text.setText(self.format_seconds_to_time(self.time_listened_total))
 
-    @staticmethod
-    def fill_all_arrays():
-        genre_plays["Genre"] = genre_name
-        genre_plays["Total Plays"] = genre_total_plays
-        genre_plays["Total Time"] = genre_total_time
-
-        artist_plays["Artist"] = artist_name
-        artist_plays["Total Plays"] = artist_total_plays
-        artist_plays["Total Time"] = artist_total_time
-
-        album_plays["Artist"] = album_artist
-        album_plays["Album"] = album_name
-        album_plays["Total Plays"] = album_total_plays
-        album_plays["Total Time"] = album_total_time
-
-        song_plays["Artist"] = song_artist
-        song_plays["Album"] = song_album
-        song_plays["Song"] = song_name
-        song_plays["Total Plays"] = song_total_plays
-        song_plays["Total Time"] = song_total_time
-
-    def fill_table(self, data: OrderedDict, active_table: str = None):
+    def fill_table(self, data: dict, active_table: str = None):
         if active_table is not None:
             self.active_table = active_table
 
@@ -297,23 +254,23 @@ class GoogleMusicStatistics(QMainWindow):
 
         # Creates entry for required info if it doesn't exist.
         try:
-            if not genre_name.__contains__(song["genre"]):
-                genre_name.append(song["genre"])
+            if not plays["Genre"]["Genre"].__contains__(song["genre"]):
+                plays["Genre"]["Genre"].append(song["genre"])
         except KeyError:
-            if not genre_name.__contains__(""):
-                genre_name.append("")
+            if not plays["Genre"]["Genre"].__contains__(""):
+                plays["Genre"]["Genre"].append("")
 
-        if not artist_name.__contains__(song["artist"]):
-            artist_name.append(song["artist"])
-        if not album_name.__contains__(song["album"]):
-            album_name.append(song["album"])
-        song_name.append(song["title"])
+        if not plays["Artist"]["Artist"].__contains__(song["artist"]):
+            plays["Artist"]["Artist"].append(song["artist"])
+        if not plays["Album"]["Album"].__contains__(song["album"]):
+            plays["Album"]["Album"].append(song["album"])
+        plays["Song"]["Song"].append(song["title"])
 
         # Indexes.
-        index_genre = genre_name.index(song["genre"] if "genre" in song else "")
-        index_artist = artist_name.index(song["artist"])
-        index_album = album_name.index(song["album"])
-        index_song = len(song_name) - 1
+        index_genre = plays["Genre"]["Genre"].index(song["genre"] if "genre" in song else "")
+        index_artist = plays["Artist"]["Artist"].index(song["artist"])
+        index_album = plays["Album"]["Album"].index(song["album"])
+        index_song = len(plays["Song"]["Song"]) - 1
 
         try:
             play_count = int(song["playCount"])
@@ -321,55 +278,55 @@ class GoogleMusicStatistics(QMainWindow):
             play_count = 0
 
         # Writes the total play count.
-        if not len(genre_total_plays) == len(genre_name):
-            genre_total_plays.append(0)
-        genre_total_plays[index_genre] += play_count
+        if not len(plays["Genre"]["Total Plays"]) == len(plays["Genre"]["Genre"]):
+            plays["Genre"]["Total Plays"].append(0)
+        plays["Genre"]["Total Plays"][index_genre] += play_count
 
-        if not len(artist_total_plays) == len(artist_name):
-            artist_total_plays.append(0)
-        artist_total_plays[index_artist] += play_count
+        if not len(plays["Artist"]["Total Plays"]) == len(plays["Artist"]["Artist"]):
+            plays["Artist"]["Total Plays"].append(0)
+        plays["Artist"]["Total Plays"][index_artist] += play_count
 
-        if not len(album_total_plays) == len(album_name):
-            album_total_plays.append(0)
-        album_total_plays[index_album] += play_count
+        if not len(plays["Album"]["Total Plays"]) == len(plays["Album"]["Album"]):
+            plays["Album"]["Total Plays"].append(0)
+        plays["Album"]["Total Plays"][index_album] += play_count
 
-        if not len(song_total_plays) == len(song_name):
-            song_total_plays.append(0)
-        song_total_plays[index_song] += play_count
+        if not len(plays["Song"]["Total Plays"]) == len(plays["Song"]["Song"]):
+            plays["Song"]["Total Plays"].append(0)
+        plays["Song"]["Total Plays"][index_song] += play_count
 
         # Writes the total time played.
-        if not len(genre_total_time) == len(genre_total_plays):
-            genre_total_time.append(0)
-        genre_total_time[index_genre] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
+        if not len(plays["Genre"]["Total Time"]) == len(plays["Genre"]["Total Plays"]):
+            plays["Genre"]["Total Time"].append(0)
+        plays["Genre"]["Total Time"][index_genre] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
-        if not len(artist_total_time) == len(artist_total_plays):
-            artist_total_time.append(0)
-        artist_total_time[index_artist] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
+        if not len(plays["Artist"]["Total Time"]) == len(plays["Artist"]["Total Plays"]):
+            plays["Artist"]["Total Time"].append(0)
+        plays["Artist"]["Total Time"][index_artist] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
-        if not len(album_total_time) == len(album_total_plays):
-            album_total_time.append(0)
-        album_total_time[index_album] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
+        if not len(plays["Album"]["Total Time"]) == len(plays["Album"]["Total Plays"]):
+            plays["Album"]["Total Time"].append(0)
+        plays["Album"]["Total Time"][index_album] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
-        if not len(song_total_time) == len(song_total_plays):
-            song_total_time.append(0)
-        song_total_time[index_song] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
+        if not len(plays["Song"]["Total Time"]) == len(plays["Song"]["Total Plays"]):
+            plays["Song"]["Total Time"].append(0)
+        plays["Song"]["Total Time"][index_song] += play_count * self.millis_to_seconds(int(song["durationMillis"]))
 
         # Artist for album view.
-        if not len(album_artist) == len(album_total_time):
-            album_artist.append(song["artist"])
+        if not len(plays["Album"]["Artist"]) == len(plays["Album"]["Total Time"]):
+            plays["Album"]["Artist"].append(song["artist"])
 
         # Artist and album for song view.
-        if not len(song_artist) == len(song_total_time):
-            song_artist.append(song["artist"])
-        if not len(song_album) == len(song_artist):
-            song_album.append(song["album"])
+        if not len(plays["Song"]["Artist"]) == len(plays["Song"]["Total Time"]):
+            plays["Song"]["Artist"].append(song["artist"])
+        if not len(plays["Song"]["Album"]) == len(plays["Song"]["Artist"]):
+            plays["Song"]["Album"].append(song["album"])
 
     def export_to_csv(self):
         active_dict = ({
-            "genre": genre_plays,
-            "artist": artist_plays,
-            "album": album_plays,
-            "song": song_plays
+            "genre": plays["Genre"],
+            "artist": plays["Artist"],
+            "album": plays["Album"],
+            "song": plays["Song"]
         }).get(self.active_table)
 
         pd.DataFrame.from_dict(active_dict).to_csv("gmusicstatistics.csv", index=False)
@@ -419,7 +376,7 @@ def main():
 
     # LoginWindow()
     app = QApplication(sys.argv)
-    ex = GoogleMusicStatistics(genre_plays)
+    ex = GoogleMusicStatistics(plays["Genre"], "genre")
     sys.exit(app.exec_())
 
 

@@ -189,7 +189,7 @@ class GoogleMusicStatistics(QMainWindow):
         message = ("<h3><b>gmusicstatistics %s</b></h3>"
                    "<b>Build Date:</b> %s"
                    "<br />Developed by Stefen Sharkey"
-                   "<br /><a href=\"https://github.com/Stefenatefun/gmusicstatistics\">GitHub</a>" %
+                   "<br /><a href=\"https://github.com/StefenSharkey/gmusicstatistics\">GitHub</a>" %
                    (gmusicstatistics_version, gmusicstatistics_build_date))
         QMessageBox.about(self, "About gmusicstatistics", message)
 

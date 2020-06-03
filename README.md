@@ -1,20 +1,21 @@
 gmusicstatistics
 ================
 
-gmusicstatistics displays various statistics for your personal [Google Music](http://music.google.com/) library using Python.
+gmusicstatistics displays various statistics for your personal [Google Play Music](http://play.google.com/music) library using Python.
 
 Compiling
 ---------
 
 gmusicstatistics compiles against the following:
 
-* [Python 2.7.11](https://www.python.org/)
-* [gmusicapi](https://github.com/simon-weber/gmusicapi)
-* [PyQt4](https://www.riverbankcomputing.com/software/pyqt/download)
+* [Python 3](https://www.python.org/)
+* [gmusicapi >= 13.0.0](https://pypi.python.org/pypi/gmusicapi)
+* [Pandas](https://pypi.python.org/pypi/pandas)
+* [PyQt5](https://pypi.python.org/pypi/PyQt5)
 
 Status and Updates
 ------------------
 
-[![Build Status](https://travis-ci.org/Stefenatefun/gmusicstatistics.svg)](https://travis-ci.org/Stefenatefun/gmusicstatistics)
+[![Build Status](https://api.travis-ci.org/StefenSharkey/gmusicstatistics.svg)](https://travis-ci.org/Stefenatefun/gmusicstatistics)
 
 See [CHANGELOG.md](CHANGELOG.md).

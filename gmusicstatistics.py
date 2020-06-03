@@ -23,7 +23,7 @@ import sys
 import pandas as pd
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import qApp, QAction, QActionGroup, QApplication, QLabel, QMainWindow, QMenu, QMessageBox, \
-    QScrollArea, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QAbstractScrollArea
+    QScrollArea, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QAbstractScrollArea, QFileDialog
 from gmusicapi import Mobileclient
 
 # NOTE: Debug mode makes processing VERY slow.
@@ -37,9 +37,9 @@ gmusicstatistics_build_date = "May 29, 2020"
 api = Mobileclient()
 
 plays = dict([("Genre", dict([("Genre", []), ("Total Plays", []), ("Total Time", [])])),
-             ("Artist", dict([("Artist", []), ("Total Plays", []), ("Total Time", [])])),
-             ("Album", dict([("Artist", []), ("Album", []), ("Total Plays", []), ("Total Time", [])])),
-             ("Song", dict([("Artist", []), ("Album", []), ("Song", []), ("Total Plays", []), ("Total Time", [])]))])
+              ("Artist", dict([("Artist", []), ("Total Plays", []), ("Total Time", [])])),
+              ("Album", dict([("Artist", []), ("Album", []), ("Total Plays", []), ("Total Time", [])])),
+              ("Song", dict([("Artist", []), ("Album", []), ("Song", []), ("Total Plays", []), ("Total Time", [])]))])
 
 
 class GoogleMusicStatistics(QMainWindow):
@@ -333,7 +333,12 @@ class GoogleMusicStatistics(QMainWindow):
             "song": plays["Song"]
         }).get(self.active_table)
 
-        pd.DataFrame.from_dict(active_dict).to_csv("gmusicstatistics.csv", index=False)
+        file_name, temp = QFileDialog.getSaveFileName(self,
+                                                      "Save Google Play Music Statistics",
+                                                      "gmusicstatistics.csv",
+                                                      "CSV (*.csv)")
+
+        pd.DataFrame.from_dict(active_dict).to_csv(file_name, index=False)
 
     def center(self):
         frame_geometry = self.frameGeometry()

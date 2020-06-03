@@ -406,6 +406,7 @@ class TableWidgetItem(QTableWidgetItem):
 
     def __init__(self, text, sort_key: int):
         super().__init__(text)
+        self.setFlags(self.flags() & ~Qt.ItemIsEditable)
         self.sort_key = sort_key
 
     def __lt__(self, other: QTableWidgetItem):

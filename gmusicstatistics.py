@@ -23,7 +23,7 @@ import sys
 import pandas as pd
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import qApp, QAction, QActionGroup, QApplication, QLabel, QMainWindow, QMenu, QMessageBox, \
-    QScrollArea, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
+    QScrollArea, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QAbstractScrollArea
 from gmusicapi import Mobileclient
 
 # NOTE: Debug mode makes processing VERY slow.
@@ -73,9 +73,12 @@ class GoogleMusicStatistics(QMainWindow):
         if create_file:
             self.file = self.init_file()
 
-        self.init_ui()
         self.init_search()
         self.fill_table(data)
+
+        self.scroll_table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        self.scroll_table.resizeColumnsToContents()
+        self.init_ui()
 
     @staticmethod
     def init_file():
@@ -101,6 +104,7 @@ class GoogleMusicStatistics(QMainWindow):
 
         self.setWindowTitle("Google Play Music Statistics")
         self.init_menu()
+        self.setMinimumSize(self.scroll_table.sizeHint())
         self.center()
         self.show()
 

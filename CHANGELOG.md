@@ -18,6 +18,7 @@ Notable changes for the [gmusicstatistics](https://github.com/StefenSharkey/gmus
 
 * License to Apache License 2.0.
 * A song's genre is now blank if it doesn't have one.
+* The window and table should now be sufficiently large.
 
 ### Removed
 

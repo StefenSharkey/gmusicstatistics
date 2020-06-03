@@ -149,37 +149,20 @@ class GoogleMusicStatistics(QMainWindow):
         action_play_types = QAction("&Play Types", self)
         action_play_types.setMenu(menu_play_types)
 
-        action_play_types_genres = QAction("&Genres", self)
-        action_play_types_genres.setCheckable(True)
-        action_play_types_genres.setActionGroup(play_types_group)
-        if self.music_dict.get_music_dict() == genre_plays:
-            self.scroll_table.clearSelection()
-            action_play_types_genres.setChecked(True)
-        action_play_types_genres.triggered.connect(lambda: self.fill_table(genre_plays))
+        action_play_types_genres = QAction("&Genres", play_types_group,
+                                           checkable=True,
+                                           triggered=lambda: self.fill_table(genre_plays, "genres"))
+        action_play_types_artists = QAction("&Artists", play_types_group,
+                                            checkable=True,
+                                            triggered=lambda: self.fill_table(artist_plays, "artists"))
+        action_play_types_albums = QAction("&Albums", play_types_group,
+                                           checkable=True,
+                                           triggered=lambda: self.fill_table(album_plays, "albums"))
+        action_play_types_songs = QAction("&Songs", play_types_group,
+                                          checkable=True,
+                                          triggered=lambda: self.fill_table(song_plays, "songs"))
 
-        action_play_types_artists = QAction("&Artists", self)
-        action_play_types_artists.setCheckable(True)
-        action_play_types_artists.setActionGroup(play_types_group)
-        if self.music_dict.get_music_dict() == artist_plays:
-            self.scroll_table.clearSelection()
-            action_play_types_artists.setChecked(True)
-        action_play_types_artists.triggered.connect(lambda: self.fill_table(artist_plays))
-
-        action_play_types_albums = QAction("&Albums", self)
-        action_play_types_albums.setCheckable(True)
-        action_play_types_albums.setActionGroup(play_types_group)
-        if self.music_dict.get_music_dict() == album_plays:
-            self.scroll_table.clearSelection()
-            action_play_types_albums.setChecked(True)
-        action_play_types_albums.triggered.connect(lambda: self.fill_table(album_plays))
-
-        action_play_types_songs = QAction("&Songs", self)
-        action_play_types_songs.setCheckable(True)
-        action_play_types_songs.setActionGroup(play_types_group)
-        if self.music_dict.get_music_dict() == song_plays:
-            self.scroll_table.clearSelection()
-            action_play_types_songs.setChecked(True)
-        action_play_types_songs.triggered.connect(lambda: self.fill_table(song_plays))
+        action_play_types_genres.setChecked(True)
 
         # Help menu
         action_about = QAction("&About", self,
